@@ -1,0 +1,45 @@
+import enaml
+from enaml.workbench.api import Extension
+from enaml.workbench.plugin_manifest import PluginManifest
+from inkcut.device.extensions import (
+    DEVICE_DRIVER_POINT,
+    DEVICE_PROTOCOL_POINT,
+    DeviceDriver,
+    DeviceProtocol,
+)
+
+
+def ecraft_factory(driver, declaration):
+    from .protocol import ECraftProtocol
+    return ECraftProtocol(declaration=declaration)
+
+
+enamldef WeCraftManifest(PluginManifest):
+    id = 'wecraft'
+
+    Extension:
+        id = 'protocols'
+        point = DEVICE_PROTOCOL_POINT
+
+        DeviceProtocol:
+            id = 'ecraft'
+            name = 'eCraft'
+            factory = ecraft_factory
+
+    Extension:
+        id = 'drivers'
+        point = DEVICE_DRIVER_POINT
+
+        DeviceDriver:
+            manufacturer = 'Craftwell'
+            model = 'eCraft'
+            width = '12in'
+            protocols = ['ecraft']
+            connections = ['serial']
+            default_config = dict(
+                connection=dict(
+                    serial=dict(
+                        baudrate=115200,
+                    ),
+                ),
+            )

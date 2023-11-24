@@ -1,2 +1,6 @@
+build/
+.idea/
 .venv/
+__enamlcache__/
 __pycache__/
+*.egg-info/

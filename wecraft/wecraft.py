@@ -18,23 +18,41 @@ class WeCraft:
             bytes([reduce(lambda a, b: (a + b) % 0x100, data), 0x16])
         ]))
 
-    def move_to(self, x, y, blade_down=False):
-        mb = bytes([blade_down])
-        mx = int(x*SCALE).to_bytes(4, 'little', signed=True)
-        my = int(y*SCALE).to_bytes(4, 'little', signed=True)
-        self._send_bytes(mb + mx + my)
+    def move(self, x, y, cut=False):
+        """
+        Move trolley to given coordinates.
 
-    def find_home(self):
+        x:   Trolley position. Increasing numbers move trolley rightwards.
+        y:   Feed position. Increasing numbers feed more material from tray.
+        cut: Whether this is a cutting move or a positioning move.
+        """
+        bc = bytes([cut])
+        bx = int(x*SCALE).to_bytes(4, 'little', signed=True)
+        by = int(y*SCALE).to_bytes(4, 'little', signed=True)
+        self._send_bytes(bc + bx + by)
+
+    def home(self):
+        """Home trolley position and align with left edge of material."""
         self._send_bytes(b'\x0a')
 
-    def set_zero(self):
+    def zero(self):
+        """Treat current trolley and feed position as x=0, y=0."""
         self._send_bytes(b'\x0c')
 
-    def load_stock(self):
+    def load(self):
+        """Feed material from tray and move trolley to bottom-left corner."""
         self._send_bytes(b'\x0e')
 
 
 def main():
+    """
+    Allows spying on traffic between a cutting machine and an application running in WINE.
+
+    Use with `socat -d -d pty,raw,echo=0 pty,raw,echo=0`.
+    Change `input_tty` to point to one end of the tunnel.
+    Symbolically link the other end of the tunnel to `~/.wine/dosdevices/com1`.
+    """
+
     wecraft_tty = '/dev/ttyUSB0'
     wecraft = WeCraft(wecraft_tty)
 

@@ -1,0 +1,11 @@
+[project]
+name = 'wecraft'
+version = '0.0.1'
+dependencies = [
+    "enaml",
+#    "inkcut",
+#    "twisted",
+]
+
+[project.entry-points."inkcut.plugin"]
+wecraft = "wecraft.inkcut.plugin:WeCraftManifest"
